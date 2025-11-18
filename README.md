@@ -1,82 +1,116 @@
-# Cocos Cards – 纸牌小游戏
+# Cocos2d-x 纸牌小游戏（需求一）
 
-一个基于 **Cocos2d-x** 的纸牌小游戏，用来完成课程给定的「纸牌程序设计」需求，并练习 **MVC 架构** 和 C++ 工程实践。
+本项目是基于 Cocos2d-x 的纸牌游戏课程作业，目标是在限定时间内，从零搭建一个简单但结构清晰的卡牌游戏 Demo，并尽量按照 MVC 思路组织代码结构。
 
-当前进度：✅ 能在场景中创建基础的 `GameScene` / `GameView` / `CardView`，并在屏幕中正确显示一张牌。
+## 项目概述
 
----
-
-## 功能目标（对应课程需求）
-
-> 具体需求参考课程提供的 PDF《纸牌程序设计【需求一】》
-
-- **基础玩法**
-  - 主牌区（Playfield）：根据关卡配置布局多张牌
-  - 底牌区 / 手牌区（Stack / Tray）：作为玩家可操作的牌堆
-  - 规则：玩家可以根据点数 ±1 的规则从桌面或牌堆出牌
-- **交互与动画**
-  - 点击牌堆翻牌到手牌区
-  - 点击符合规则的桌面牌，使其飞到手牌区顶部
-  - 牌移动使用 Cocos2d-x 动作系统（`MoveTo` 等）
-- **回退（Undo）系统**
-  - 记录每一步操作
-  - 支持多步撤销：牌按相反动画飞回原位
-
----
-
-## 技术栈
-
+- 引擎：Cocos2d-x
 - 语言：C++
-- 引擎：Cocos2d-x 3.17
-- 架构：MVC（`GameModel / GameView / GameController`）
-- 开发环境：
-  - Windows + Visual Studio（工程使用 Cocos 官方模板创建）
-  - 设计分辨率：1080 × 2080，`FIXED_WIDTH`
+- 架构：简单的 MVC（GameScene / GameView / GameModel / Controller）
+- 核心要素：
+  - 卡牌模型：点数、花色、在场景中的位置
+  - 卡牌视图：底牌贴图 + 大号数字 + 小号数字 + 花色图标
+  - 关卡配置：从 JSON 读取牌面布局
+  - 基本交互：点击牌、后续将接入出牌逻辑与撤销（Undo）
 
----
+## 目录结构（简要）
 
-## 当前进度
+> 实际目录以工程为准，这里只列出和本次需求密切相关的部分。
 
-### Day 1 – 环境与架构准备
+- `Classes/`
+  - `scenes/GameScene.*`：入口场景，挂载 GameView
+  - `views/GameView.*`：负责整块游戏画面的布局（主牌区 + 底牌区）
+  - `views/CardView.*`：一张可视化的卡牌（Sprite 组合）
+  - `models/CardModel.*`：卡牌数据模型（点数、花色、ID 等）
+  - `configs/models/LevelConfig.*`：关卡静态配置（从 JSON 解析后的数据结构）
+  - `configs/loaders/LevelConfigLoader.*`：读取 JSON 并生成 LevelConfig
+  - `utils/CardResUtil.*`：根据点数/花色生成资源路径、辅助判断红黑等
+- `Resources/`
+  - `res/card_bg.png`：空白底牌
+  - `res/number/`：大/小数字贴图（big_red_5.png / small_black_A.png 等）
+  - `res/suits/`：花色贴图（heart.png / spade.png 等）
+  - `configs/levels/level1.json`：示例关卡配置
 
-- 完成 Cocos2d-x 环境安装与配置
-- 阅读引擎模板代码，理解基本启动流程（`AppDelegate` / `Director` / `Scene`）
-- 初步设计项目的 MVC 结构：
-  - `GameScene` 作为入口场景
-  - `GameView` 负责场景内所有 UI/牌面展示
-  - `GameModel` / `CardModel` 用于抽象游戏与牌的数据
+## 开发进度
 
-### Day 2 – 显示第一张牌
+### Day 1 - 环境搭建 & 框架初建
 
-- 新建 `GameScene`，并在 `AppDelegate` 中切换到该场景作为游戏入口
-- 搭建基础 `GameView`：
-  - 获取屏幕 `visibleSize`，将 `GameView` 填满屏幕
-  - 使用 `LayerColor` 分割上方主牌区 / 下方底牌区
-  - 学习并实践了 `ContentSize`、`AnchorPoint`、`Position` 的关系
-- 实现最小可用版 `CardModel` + `CardView`：
-  - `CardModel`：使用课程 PDF 里的 `CardFaceType` / `CardSuitType` 枚举存储牌面信息
-  - `CardView`：继承 `Node`，在内部用 `DrawNode` 画出一张矩形牌作为占位
-  - 在 `GameView` 中创建一张牌并成功显示在屏幕中（验证坐标与视图结构正确）
-- 理解了 Cocos2d-x 中 `Ref` / `autorelease` 的基本使用方式
+- 完成 Cocos2d-x 开发环境配置，能够成功编译运行空工程。
+- 了解基本引擎结构（`Director` / `Scene` / `Layer` / `Node`）。
+- 搭建基础 MVC 思路：
+  - `GameScene` 作为场景入口。
+  - 预留 `GameView`、`GameModel`、`Controller` 的职责划分。
 
-更详细的过程记录见：[DEVLOG.md](./DEVLOG.md)
+### Day 2 - GameScene & 基础 CardView
 
----
+- 创建 `GameScene` 和 `GameView`，建立主牌区和底牌区两个基础布局。
+- 实现最简单的 `CardModel` / `CardView`：
+  - 通过 `DrawNode` 或简单 Sprite，在屏幕上画出一张“调试用”的卡牌。
+  - 初步理解 `visibleSize`、`ContentSize`、锚点（AnchorPoint）等概念。
+- 确认从 `GameScene` 挂载 `GameView`，并在 `GameView` 中创建并显示单张卡牌。
 
-## 目录结构（进行中）
+### Day 3 - 完整卡牌 & 事件监听（2025-11-18）
 
-> 根据课程要求和 MVC 思路逐步整理中
+**1. 完整卡牌模型与显示**
 
-```text
-.
-├─ Classes/
-│  ├─ GameScene.h / GameScene.cpp     # 主场景（入口）
-│  ├─ GameView.h / GameView.cpp       # 场景视图，负责布局与牌面展示
-│  ├─ CardModel.h / CardModel.cpp     # 单张牌的数据模型
-│  ├─ CardView.h / CardView.cpp       # 单张牌的视图
-│  ├─ GameConfig.h                    # 花色、点数等枚举和配置
-│  └─ （后续：GameModel / GameController / UndoManager 等）
-├─ Resources/
-│  └─ （牌面图片、关卡 JSON 等资源）
-├─ proj.win32/                        # Visual Studio 工程目录（自动生成）
-└─ DEVLOG.md
+- 将卡牌从“纯色矩形”升级为“真正的纸牌”：
+  - 使用 `CardModel + CardView` 组合：
+    - 底牌背景：`card_bg.png`
+    - 大号数字贴图：`res/number/big_*.png`
+    - 小号数字 + 花色贴图：`res/number/small_*.png` + `res/suits/*.png`
+- 处理卡牌大小与缩放：
+  - 基于底牌原始贴图大小，按目标高度计算 `scale`，等比放大。
+  - 同步更新 `CardView::ContentSize`，保证点击区域和布局计算与实际显示一致。
+- 系统性理解各类坐标：
+  - 世界坐标（`touch->getLocation()`）
+  - 节点本地坐标（`convertToNodeSpace`）
+  - 不同 Anchor 下的位置含义及影响。
+
+**2. 资源路径逻辑重构**
+
+- 将“根据点数/花色 → 资源文件名”的多处 `switch` 抽离到工具类中：
+  - 新增 `CardResUtil`（命名可根据工程实际为 `CardResUtil.*` 或类似）：
+    - `faceToSymbol(CardFaceType)`：`A/2/.../10/J/Q/K`
+    - `isRedSuit(CardSuitType)`：判断红牌/黑牌
+    - `suitToTexturePath(CardSuitType)`：返回花色贴图路径
+    - `bigFaceTexturePath(face, suit)` / `smallFaceTexturePath(face, suit)`
+- 好处：
+  - 避免在 `CardView` 中硬编码复杂逻辑。
+  - 资源命名或美术资源变更时，只需修改 util 一处。
+
+**3. Cocos2d-x 事件系统与点击监听**
+
+- 学习 Cocos2d-x 中触摸/点击事件的整体流程：
+  - 引擎内部从操作系统接收输入 → 封装为 `Touch` & `Event` → 使用 `EventDispatcher` 分发。
+  - 通过 `EventListenerTouchOneByOne` 注册单点触摸监听。
+- 在 View 中实际接入：
+  - 在 `CardView::init` 中创建监听器并绑定：
+    - `onTouchBegan(Touch*, Event*)`
+    - `onTouchEnded(Touch*, Event*)`
+  - 通过：
+    - `touch->getLocation()` 获取点击世界坐标。
+    - `convertToNodeSpace()` 转换到当前卡牌的本地坐标。
+    - 使用 `Rect(0,0,width,height).containsPoint(localPos)` 做命中检测。
+  - 为后续通过回调将“点击事件”传递给 Controller 做好准备（`std::function<void(CardView*)>` 形式的回调）。
+
+**4. 当前尚未完全理解的部分**
+
+- `LevelConfigLoader` 中 JSON 解析逻辑：
+  - 使用 AI 辅助生成了 `LevelConfigLoader::loadLevelConfig` 的基本实现。
+  - 能够正确从 `level1.json` 读取牌面数据，并在场景中展示。
+  - 但对 rapidjson 的细节（`Document` / `Value` / 数组访问等）尚未完全吃透，计划在笔试结束后进行二次阅读与重构。
+
+## TODO / 下一步计划
+
+1. **卡牌点击回调与 Controller 逻辑**
+   - 将 `CardView` 中的点击事件，通过回调传递至控制层（例如 `GameController`）。
+   - 完成基础规则判断：哪些牌是可选的、点击后如何更新模型和视图。
+   - 建立最小的选中/取消选中、高亮反馈。
+
+2. **撤销（Undo）逻辑**
+   - 为每一步操作记录操作栈（从 GameModel 的角度记录状态变化）。
+   - 支持至少一层/多层撤销，满足需求 1–3 的基本要求。
+
+3. **（可选）遮挡关系与层级**
+   - 设计卡牌的遮挡关系（Z-order 或按照布局规则控制绘制次序）。
+   - 优化重叠区域视觉效果，使牌堆、布局更接近真实游戏体验。

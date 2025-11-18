@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="win32">
+      <UniqueIdentifier>{84a8ebd7-7cf0-47f6-b75e-d441df67da40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{715254bc-d70b-4ec5-bf29-467dd3ace079}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{bb6c862e-70e9-49d9-81b7-3829a6f50471}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class">
+      <UniqueIdentifier>{04e84fe2-4e5d-4038-992d-93ed4e9e126d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\models">
+      <UniqueIdentifier>{3b52adfc-a62c-4032-b5a1-1019d92acf8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\views">
+      <UniqueIdentifier>{ee4203bd-6ca1-44b7-9b9e-a3780f495869}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\controllers">
+      <UniqueIdentifier>{b2caf4f7-9b93-4fe0-8ed2-715739916015}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\configs">
+      <UniqueIdentifier>{9d1be697-30a6-4471-9e8c-432a39742991}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\managers">
+      <UniqueIdentifier>{e64490b2-495c-4788-9abf-bb7fbe7b45c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\utils">
+      <UniqueIdentifier>{642d71c6-b5fa-4205-9849-6f66f4f4cf64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\configs\models">
+      <UniqueIdentifier>{fb0419c3-17ce-4910-86a0-c05f273385c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\configs\loaders">
+      <UniqueIdentifier>{00b01581-f785-4c3f-8acb-4375351fc801}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GameScene.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\AppDelegate.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\models\CardModel.cpp">
+      <Filter>Class\models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\models\GameModel.cpp">
+      <Filter>Class\models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\models\UndoModel.cpp">
+      <Filter>Class\models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\controllers\GameController.cpp">
+      <Filter>Class\controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\controllers\PlayfieldController.cpp">
+      <Filter>Class\controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\controllers\StackController.cpp">
+      <Filter>Class\controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\managers\UndoManager.cpp">
+      <Filter>Class\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\utils\GameModelFromLevelGenerator.cpp">
+      <Filter>Class\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\views\CardView.cpp">
+      <Filter>Class\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\views\GameView.cpp">
+      <Filter>Class\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\utils\CardTextUtil.cpp">
+      <Filter>Class\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\configs\models\GameConfig.cpp">
+      <Filter>Class\configs\models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\configs\models\LevelConfig.cpp">
+      <Filter>Class\configs\models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\configs\loaders\LevelConfigLoader.cpp">
+      <Filter>Class\configs\loaders</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="main.h">
+      <Filter>win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GameScene.h">
+      <Filter>Class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\AppDelegate.h">
+      <Filter>Class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\models\CardModel.h">
+      <Filter>Class\models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\models\GameModel.h">
+      <Filter>Class\models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\models\UndoModel.h">
+      <Filter>Class\models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\controllers\GameController.h">
+      <Filter>Class\controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\controllers\PlayfieldController.h">
+      <Filter>Class\controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\controllers\StackController.h">
+      <Filter>Class\controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\managers\UndoManager.h">
+      <Filter>Class\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\utils\GameModelFromLevelGenerator.h">
+      <Filter>Class\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\views\GameView.h">
+      <Filter>Class\views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\views\CardView.h">
+      <Filter>Class\views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\utils\CardTextUtil.h">
+      <Filter>Class\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\configs\models\GameConfig.h">
+      <Filter>Class\configs\models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\configs\models\LevelConfig.h">
+      <Filter>Class\configs\models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\configs\loaders\LevelConfigLoader.h">
+      <Filter>Class\configs\loaders</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="game.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

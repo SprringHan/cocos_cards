@@ -1,0 +1,170 @@
+本项目严格按照从零到八路径学习
+
+## Step 0：把环境跑起来 + 大致读懂需求
+
+**目标：能跑出一个空白 Cocos 程序，知道游戏要做什么。**
+
+* 安装好 Cocos2d-x 3.17，创建工程，确认能编译运行。
+* 在 `AppDelegate` 里按文档设置分辨率：
+  `1080 * 2080`，`FIXED_WIDTH`。
+* 粗读一遍 PDF：
+
+  * 主玩法：底牌 ±1 消除
+  * 三个区域：主牌区（Playfield）、底牌堆（Tray）、备牌堆（Stack）
+  * 三个需求：
+
+    1. 点击手牌区 A → 平移到顶部牌上方并替换
+    2. 点击桌面牌（点数差 1）→ 移到手牌区顶部并替换
+    3. 多步「回退」功能（撤销动画 + 状态）
+
+---
+
+## Step 1：搭一个最简单的 GameScene 框架
+
+**目标：有一个能显示出来的主场景 + 两个大区域占位。**
+
+* 新建 `GameScene` / `GameLayer`（或者 `GameView`，看你之前的命名）。
+* 在场景里简单用 `DrawNode` / `LayerColor` 把：
+
+  * 上方 1080×1500 作为主牌区（Playfield）
+  * 下方 1080×580 作为手牌区 + 备牌区（Stack/Tray）
+* 先不管 MVC，先让你脑子里对「位置和坐标」有直观感受。
+
+---
+
+## Step 2：把「场地画出来」
+
+**目标：能在正确的位置看到若干张静态的牌。**
+
+* 按文档里的主牌区 / 堆牌区布局，用固定坐标先画几张牌（可以先用同一张图片当占位）。
+* 把「主牌区」和「手牌区顶部」的位置定死下来，比如：
+
+  * 主牌区：上面几排散开
+  * 手牌区顶部牌：底部中间一张
+* 确保你知道「一张牌的锚点、大小、坐标」这些最基本的东西。
+
+---
+
+## Step 3：加上 CardModel / CardView（最小可用版）
+
+**目标：让每一张牌不再是“死图”，而是有点/花色信息的对象。**
+
+* 在 `models/` 里写：
+
+  * `CardModel`：保存 `cardId / face / suit / 是否在主牌区 / 是否在手牌堆` 等。
+* 在 `views/` 里写：
+
+  * `CardView`：继承 `Node` / `Sprite`，内部根据 `CardModel` 选择贴图（可以先写死几张图片）。
+* 在 GameScene 里用一个小数组：
+
+  * 创建若干 `CardModel`
+  * 对应创建 `CardView`，摆在之前 Step 2 定好的位置上
+
+（这一步的核心是：你能用“数据 + 视图”方式生成牌，而不是手写十几行 createSprite。）
+
+---
+
+## Step 4：读关卡配置 JSON，把牌按配置摆出来
+
+**目标：从配置文件生成一整局牌，而不是写死在代码里。**
+
+* 根据 PDF 里的 JSON 格式：`Playfield` / `Stack` / `CardFace` / `CardSuit` / `Position` 等
+* 在 `configs/` 里写：
+
+  * `LevelConfig`（结构体或类，存 Playfield/Stack 配置）
+  * `LevelConfigLoader`：从 JSON 读出配置。
+* 在 `services/` 里写：
+
+  * `GameModelFromLevelGenerator`：把 `LevelConfig` → `GameModel`（里面包含一堆 `CardModel`）。
+* 用 `GameModel` 生成对应的 `CardView`，位置来自 JSON 里的 `Position`，这样就和关卡配置联动了。
+
+---
+
+## Step 5：搭 MVC 结构 + 点击事件打通一条链路
+
+**目标：从“点到一张牌 → 控制器收到 → 打印一行 log”跑通。**
+
+* 按文档要求建好目录结构：`models/ views/ controllers/ managers/ services/ utils/ configs/`。
+* 写基础类：
+
+  * `GameModel`：包含所有牌的 `CardModel` 数组 + 当前手牌顶部 id 等。
+  * `GameView`：管理 PlayfieldView / StackView / UndoButton 等子视图。
+  * `GameController`：持有 `GameModel` + `GameView`。
+* 在 `CardView` / `PlayFieldView` 上加触摸监听：
+
+  * 被点击时，回调 `GameController::handleCardClick(cardId)`。
+* 先不做任何逻辑，在 `handleCardClick` 里只 `CCLOG("click card %d", cardId)`，确认点击链路打通。
+
+---
+
+## Step 6：实现需求 1 & 2 的核心逻辑 + MoveTo 动画
+
+**目标：能完成最基本的「替换手牌顶部」和「匹配消除再替换」。**
+
+1. **需求 1：手牌区翻牌替换**
+
+   * 在手牌区（Stack）点击一张牌 A：
+
+     * Controller 判断：这张是备牌堆的下一张牌；
+     * 更新 `GameModel`：
+
+       * A 从备牌堆移出
+       * A 变成新的「手牌顶部」
+     * 通知 `GameView` 做动画：
+
+       * 用 `MoveTo` 把 A 移动到手牌顶部牌的位置
+       * 原顶部牌可以移到弃牌堆（或直接隐藏）。
+
+2. **需求 2：桌面牌与手牌顶部牌匹配**
+
+   * 在 `GameController::handleCardClick` 中：
+
+     * 取出当前手牌顶部的 `CardFace`；
+     * 检查点差是否为 1（不看花色）；
+     * 若可匹配：
+
+       * 更新 `GameModel`：桌面牌从 Playfield 移除，变成新的手牌顶部；
+       * 通知 `GameView`：播放从 Playfield 飞到手牌顶部位置的 `MoveTo` 动画。
+
+---
+
+## Step 7：实现 Undo（回退）链路
+
+**目标：能做到：连续点击几步后，按「回退」按钮，牌会一步步按相反方向飞回去。**
+
+* 在 `models/` 里加：
+
+  * `UndoRecord`（记录一次操作的信息：是「从备牌到手牌」还是「从桌面到手牌」，涉及哪些 cardId，原位置/原区域等）。
+  * `UndoModel`（一个栈：`vector<UndoRecord>`）。
+* 在 `managers/` 里写：
+
+  * `UndoManager`：负责：
+
+    * `pushRecord(record)`：每做一笔操作（需求 1 / 2）就存一条；
+    * `popRecord()`：点击回退按钮时取出最后一条记录。
+* 在 `controllers/` 里：
+
+  * `GameController::onUndoButtonClicked()`：
+
+    * 向 `UndoManager` 要一条记录；
+    * 按记录内容反向修改 `GameModel`；
+    * 通知 `GameView` 做「反向 MoveTo」动画（从手牌顶部飞回原位置）。
+* 当 `UndoManager` 里已经没有记录时，再点回退就无效果。
+
+---
+
+## Step 8：整理结构 + 处理边界 + 写一点文档
+
+**目标：游戏能完整跑一盘，代码不至于一团乱麻。**
+
+* 根据文档的规范，整理一下：
+
+  * 类的注释、成员变量注释、公共方法注释。
+  * 函数过长就拆分，小模块放进 `services/` / `utils/`。
+* 检查边界情况：
+
+  * 备牌堆用完怎么办？（禁止再点、给提示等）
+  * 桌面无可消除时，只能翻备牌；
+  * 一步都没走时不能回退；已经回退到最初也不能继续回退。
+* 写一个非常短的小文档（哪怕是 Markdown）：
+
